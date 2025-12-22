@@ -1,0 +1,193 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SUPLAY - SPMO Virtual Store{% endblock %}</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        /* --- MODERN GOVERNMENT THEME (Emerald & Slate) --- */
+        :root {
+            /* Emerald 700 main color */
+            --bs-primary: #047857; 
+            --bs-primary-rgb: 4, 120, 87;
+            --bs-body-font-family: 'Inter', sans-serif;
+            --bs-body-bg: #f8fafc; /* Slate 50 */
+            --bs-link-color: #047857;
+            --bs-link-hover-color: #065f46;
+        }
+
+        body {
+            font-family: var(--bs-body-font-family);
+            background-color: var(--bs-body-bg);
+            color: #334155; /* Slate 700 */
+        }
+
+        /* --- NAVBAR STYLING --- */
+        .navbar {
+            background-color: #ffffff !important;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: #0f172a !important; /* Slate 900 */
+            font-size: 1.25rem;
+            letter-spacing: -0.025em;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: #64748b !important; /* Slate 500 */
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #047857 !important; /* Emerald 700 */
+        }
+
+        .nav-link.active {
+            font-weight: 600;
+        }
+
+        /* --- BUTTONS & INPUTS --- */
+        .btn {
+            border-radius: 0.5rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-primary:hover {
+            background-color: #065f46; /* Emerald 800 */
+            border-color: #065f46;
+        }
+
+        .form-control {
+            border-radius: 0.5rem;
+            border-color: #cbd5e1;
+            padding: 0.6rem 1rem;
+        }
+
+        .form-control:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.25);
+        }
+
+        /* Footer */
+        footer {
+            background-color: #ffffff;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'home' %}">
+                <div class="bg-success text-white rounded p-1 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                    <i class="bi bi-box-seam-fill"></i>
+                </div>
+                <div class="d-flex flex-column">
+                    <span style="line-height: 1;">SUPLAY</span>
+                    <span class="text-muted text-uppercase" style="font-size: 0.55rem; letter-spacing: 1.5px;">by SSPMO</span>
+                </div>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center gap-1">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">Catalog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'my_app_status' %}">Requisitions</a>
+                        </li>
+
+                        {% if user.is_superuser %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Admin</a>
+                            <ul class="dropdown-menu border-0 shadow-sm">
+                                <li><a class="dropdown-item" href="{% url 'transaction_list' %}">Transactions</a></li>
+                                <li><a class="dropdown-item" href="{% url 'inventory_list' %}">Inventory</a></li>
+                                <li><a class="dropdown-item" href="{% url 'delivery_dashboard' %}">Delivery</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/admin/" target="_blank">Admin Panel</a></li>
+                            </ul>
+                        </li>
+                        {% endif %}
+
+                        <li class="nav-item ms-2">
+                            <a class="btn btn-outline-secondary btn-sm position-relative border-0" href="{% url 'view_cart' %}">
+                                <i class="bi bi-cart3 fs-5"></i>
+                                {% if request.session.cart %}
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light">
+                                        {{ request.session.cart|length }}
+                                    </span>
+                                {% endif %}
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item ms-2">
+                            <div class="dropdown">
+                                <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+                                    <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 35px; height: 35px;">
+                                        {{ user.username|first|upper }}
+                                    </div>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
+                                    <li><span class="dropdown-item-text text-muted small">Signed in as <strong>{{ user.username }}</strong></span></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
+                                    <li>
+                                        <form action="{% url 'logout' %}" method="post" class="d-block">
+                                            {% csrf_token %}
+                                            <button type="submit" class="dropdown-item text-danger">Sign out</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="btn btn-primary px-4" href="{% url 'login' %}">Login</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow-1">
+         {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="py-4 mt-auto">
+        <div class="container text-center">
+            <p class="mb-0 text-muted small">&copy; {% now "Y" %} SPMO SUPLAY. Official UPSA Supplies Shopping Site.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

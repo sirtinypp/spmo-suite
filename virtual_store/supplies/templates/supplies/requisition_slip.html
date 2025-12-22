@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+{% load static %}
+{% load humanize %}
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Requisition and Issuance Slip</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 1cm;
+            margin-bottom: 1cm;
+        }
+        
+        body { 
+            font-family: Helvetica, Arial, sans-serif; 
+            font-size: 10px; 
+            color: #2c2c2c; 
+        }
+
+        /* --- WATERMARK --- */
+        #watermark {
+            position: fixed;
+            top: 25%;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            opacity: 0.3;
+            z-index: -1000;
+            padding-bottom: 2px;
+        }
+
+        /* --- HEADER --- */
+        .header-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header-logo {
+            width: 60px; 
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .agency-name {
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+            font-family: Palatino, serif;
+        }
+        .office-name {
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            color: #444;
+        }
+        .doc-title {
+            font-size: 12px;
+            font-weight: normal;
+            margin-top: 5px;
+            border-top: 1px solid #444;
+            display: inline-block;
+            padding-top: 5px;
+        }
+
+        /* --- TABLES --- */
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .items-table th {
+            background-color: #f0f0f0;
+            color: #000;
+            border: 1px solid #888;
+            padding: 4px;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 9px;
+        }
+        .items-table td {
+            border: 1px solid #888;
+            padding: 4px;
+            background-color: transparent;
+            font-size: 9px;
+            vertical-align: top;
+            word-wrap: break-word;
+        }
+        
+        .description-cell { text-align: left; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        
+        .total-row {
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+
+        /* --- SIGNATURE SECTION (Compact) --- */
+        .footer-table {
+            width: 100%;
+            margin-top: 20px; /* Reduced top margin */
+            page-break-inside: avoid;
+        }
+        .sig-box {
+            width: 33%;
+            padding: 5px;
+            vertical-align: top;
+        }
+        
+        /* ADJUSTED: Reduced margin to bring signature space closer */
+        .label {
+            font-size: 9px;
+            color: #666;
+            margin-bottom: 25px; /* Changed from 40px to 25px */
+            text-transform: uppercase;
+        }
+
+        .signatory-name {
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 11px;
+            text-align: center;
+            margin-bottom: 0px; /* Removed margin */
+            line-height: 1.2;
+        }
+        .signature-line {
+            border-bottom: 1px solid #000;
+            margin-bottom: 2px;
+            margin-top: 0;
+        }
+        .designation {
+            font-size: 9px;
+            font-style: italic;
+            text-align: center;
+            color: #444;
+            margin-top: 0;
+            line-height: 1.1;
+        }
+
+        /* --- DISCLOSURE --- */
+        .disclosure {
+            margin-top: 40px; 
+            font-size: 8px;
+            color: #666;
+            text-align: justify;
+            border-top: 1px solid #ccc;
+            padding-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="watermark">
+    </div>
+
+    <div class="header-container">
+        <img src="C:/Users/Aaron/office_supplies/media/images/UP-logo.png" class="header-logo">
+        <div class="agency-name">University of the Philippines System</div>
+        <div class="office-name">Supply and Property Management Office</div>
+        <div class="doc-title">Requisition and Issuance Slip</div>
+    </div>
+
+    <table width="100%" style="margin-bottom: 15px;">
+        <tr>
+            <td width="60%">
+                <strong>Unit/Office:</strong> _______________________
+            </td>
+            <td width="40%" class="text-right">
+                <strong>RIS No.:</strong> {{ order.id|stringformat:"06d" }} <br>
+                <span style="font-size: 10px;">{{ date|date:"F j, Y" }}</span>
+            </td>
+        </tr>
+    </table>
+
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th width="50%">Description</th>
+                <th width="10%" class="text-center">Qty</th>
+                <th width="20%" class="text-right">Unit Cost</th>
+                <th width="20%" class="text-right">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+            <tr>
+                <td class="description-cell">
+                    <b style="font-size: 10px;">{{ item.product.name }}</b>
+                </td>
+                <td class="text-center">{{ item.quantity }}</td>
+                <td class="text-right">P {{ item.product.price|floatformat:2|intcomma }}</td>
+                <td class="text-right">P {{ item.subtotal|floatformat:2|intcomma }}</td>
+            </tr>
+            {% endfor %}
+            
+            <tr class="total-row">
+                <td colspan="3" class="text-right">TOTAL</td>
+                <td class="text-right">P {{ total|floatformat:2|intcomma }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="footer-table">
+        <tr>
+            <td class="sig-box">
+                <div class="label">Requested By:</div>
+                <div class="signatory-name">{{ user.first_name }} {{ user.last_name }}</div>
+                <div class="signature-line"></div>
+                <div class="designation">xxxxxxx</div>
+            </td>
+
+            <td class="sig-box">
+                <div class="label">Approved By:</div>
+                <div class="signatory-name">&nbsp;</div> 
+                <div class="signature-line"></div>
+                <div class="designation">Head of Office / Unit</div>
+            </td>
+
+            <td class="sig-box">
+                <div class="label">Issued By:</div>
+                <div class="signatory-name">&nbsp;</div> 
+                <div class="signature-line"></div>
+                <div class="designation">Supply Officer</div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="disclosure">
+        <strong>CERTIFICATION AND DATA PRIVACY NOTICE:</strong><br>
+        I hereby certify that the items listed above are necessary for the official use and operations of the University of the Philippines. 
+        I understand that the personal information included in this form is processed in compliance with the Data Privacy Act of 2012 (R.A. 10173). 
+        The information collected will be used solely for the purpose of inventory management, supply issuance, and auditing requirements of the University.
+    </div>
+
+</body>
+</html>

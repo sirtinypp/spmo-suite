@@ -1,0 +1,134 @@
+{% extends 'supplies/base.html' %}
+
+{% block title %}Checkout - SSPMO Virtual Store{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-dark">Checkout</h2>
+        <p class="text-muted">Complete your request details below</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                
+                <div class="card-header bg-primary py-3 px-4">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-file-earmark-text me-2 fs-5 text-white"></i>
+                        <h5 class="mb-0 fw-bold text-white">Request Form</h5>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-md-5 bg-white">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <h6 class="text-uppercase text-muted fw-bold small mb-3 letter-spacing-1">
+                            <i class="bi bi-person-badge me-1"></i> Employee Information
+                        </h6>
+                        
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="name" class="form-label fw-bold small">Employee Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control bg-light border-0 py-2" id="name" name="name" placeholder="Full Name" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="department" class="form-label fw-bold small">Unit/Office <span class="text-danger">*</span></label>
+                                <select class="form-select bg-light border-0 py-2" id="department" name="department" required>
+                                    <option value="" selected disabled>Select Office...</option>
+                                    <option value="UPRI">UPRI</option>
+                                    <option value="BGC">BGC</option>
+                                    <option value="PGC">PGC</option>
+                                    <option value="PRESS">PRESS</option>
+                                    <option value="ITDC">ITDC</option>
+                                    <option value="ACCOUNTING">ACCOUNTING</option>
+                                    <option value="CIDS ADMIN">CIDS ADMIN</option>
+                                    <option value="OVPPA">OVPPA</option>
+                                    <option value="MPRO">MPRO</option>
+                                    <option value="ADMISSIONS">ADMISSIONS</option>
+                                    <option value="PAHINUNGOD">PAHINUNGOD</option>
+                                    <option value="TVUP">TVUP</option>
+                                    <option value="BUDGET">BUDGET</option>
+                                    <option value="OP">OP</option>
+                                    <option value="EH">EH</option>
+                                    <option value="OVPA">OVPA</option>
+                                    <option value="SPMO">SPMO</option>
+                                    <option value="CASH">CASH</option>
+                                    <option value="HRDO">HRDO</option>
+                                    <option value="OVPPF">OVPPF</option>
+                                    <option value="OVPAA">OVPAA</option>
+                                    <option value="OIL">OIL</option>
+                                    <option value="TTBDO">TTBDO</option>
+                                    <option value="CWGS">CWGS</option>
+                                    <option value="OVPD">OVPD</option>
+                                    <option value="ODPI">ODPI</option>
+                                    <option value="PADAYON">PADAYON</option>
+                                    <option value="OAR">OAR</option>
+                                    <option value="OVPLA">OVPLA</option>
+                                    <option value="OSU">OSU</option>
+                                    <option value="CIFAL">CIFAL</option>
+                                    <option value="KRC">KRC</option>
+                                    <option value="PMO">PMO</option>
+                                    <option value="OFR">OFR</option>
+                                    <option value="OSR">OSR</option>
+                                    <option value="UPS ISC">UPS ISC</option>
+                                    <option value="Facilities Management Office">Facilities Management Office</option>
+                                    <option value="COA">COA</option>
+                                    <option value="CIDS PEP">CIDS PEP</option>
+                                    <option value="CIDS DSPPP">CIDS DSPPP</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr class="text-muted opacity-25 my-4">
+                        
+                        <h6 class="text-uppercase text-muted fw-bold small mb-3 letter-spacing-1">
+                            <i class="bi bi-paperclip me-1"></i> Supporting Documents
+                        </h6>
+                        
+                        <div class="mb-3">
+                            <label for="document1" class="form-label fw-bold small">Requisition and Issuance Slip <span class="text-danger">*</span></label>
+                            <input type="file" class="form-control" id="document1" name="document1" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" required>
+                            <div class="form-text small text-muted"><i class="bi bi-info-circle me-1"></i>Required. Accepted formats: PDF, Word, Images (Max 10MB)</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="document2" class="form-label fw-bold small">Disbursement Voucher <span class="text-danger">*</span></label>
+                            <input type="file" class="form-control" id="document2" name="document2" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" required>
+                            <div class="form-text small text-muted"><i class="bi bi-info-circle me-1"></i>Required.</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="document3" class="form-label fw-bold small">Other Documents (Optional)</label>
+                            <input type="file" class="form-control" id="document3" name="document3" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                        </div>
+                        
+                        <div class="alert alert-light border-start border-primary border-4 rounded-3 shadow-sm mb-4">
+                            <div class="d-flex">
+                                <i class="bi bi-shield-check text-primary fs-4 me-3"></i>
+                                <div>
+                                    <strong class="d-block text-dark">Ready for Review</strong>
+                                    <small class="text-muted">Your order will be sent to the admin team for approval upon submission.</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-3 d-md-flex justify-content-md-end">
+                            <a href="{% url 'view_cart' %}" class="btn btn-outline-secondary fw-bold px-4 py-2">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary fw-bold px-5 py-2 shadow-sm">
+                                Place Order <i class="bi bi-send ms-2"></i>
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

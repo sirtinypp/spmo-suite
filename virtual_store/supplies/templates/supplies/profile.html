@@ -1,0 +1,169 @@
+{% extends 'supplies/base.html' %}
+
+{% block title %}My Profile - SSPMO Virtual Store{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    
+    <div class="row mb-5 align-items-center">
+        <div class="col-md-8">
+            <h1 class="fw-bold text-dark mb-1">My Profile</h1>
+            <p class="text-muted">Welcome back, {{ user.username }}</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3 mb-4">
+            <div class="card shadow-sm border-0 rounded-4 text-center p-4">
+                <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <span class="display-5 fw-bold">{{ user.username|slice:":1"|upper }}</span>
+                </div>
+                <h5 class="fw-bold mb-1">{{ user.first_name }} {{ user.last_name }}</h5>
+                <p class="text-muted small mb-3">@{{ user.username }}</p>
+                <div class="d-grid">
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button class="btn btn-outline-danger btn-sm w-100 rounded-pill">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            <h5 class="fw-bold text-dark mb-3">My Request History</h5>
+            
+            {% if orders %}
+                <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr class="text-uppercase small text-muted fw-bold">
+                                    <th class="ps-4 py-3" style="width: 50px;"></th> <th class="py-3">Order #</th>
+                                    <th class="py-3">Date</th>
+                                    <th class="py-3">Office</th>
+                                    <th class="py-3">Items</th>
+                                    <th class="py-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="border-top-0">
+                                {% for order in orders %}
+                                
+                                <tr class="border-bottom hover-bg-light transition-all">
+                                    <td class="ps-4">
+                                        <button class="btn btn-sm btn-light border rounded-circle shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#details{{ order.id }}" aria-expanded="false">
+                                            <i class="bi bi-chevron-down text-muted"></i>
+                                        </button>
+                                    </td>
+                                    
+                                    <td><span class="fw-bold text-dark">#{{ order.id }}</span></td>
+                                    <td class="text-muted">{{ order.created_at|date:"M d, Y" }}</td>
+                                    <td>{{ order.department }}</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border fw-normal">
+                                            {{ order.items.count }} Items
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if order.status == 'pending' %}
+                                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-3">Pending</span>
+                                        {% elif order.status == 'approved' %}
+                                            <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle rounded-pill px-3">Ready for Pickup</span>
+                                        {% elif order.status == 'returned' %}
+                                            <span class="badge bg-danger-subtle text-danger-emphasis border border-danger-subtle rounded-pill px-3">Returned</span>
+                                            {% if order.remarks %}
+                                                <div class="small text-danger mt-1 fst-italic" style="font-size: 0.75rem;">
+                                                    Note: {{ order.remarks }}
+                                                </div>
+                                            {% endif %}
+                                        {% elif order.status == 'delivered' %}
+                                            <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle rounded-pill px-3">Delivered</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td colspan="6" class="p-0 border-0">
+                                        <div class="collapse bg-light shadow-inner" id="details{{ order.id }}">
+                                            <div class="p-4">
+                                                <div class="row g-4">
+                                                    
+                                                    <div class="col-lg-8">
+                                                        <h6 class="text-uppercase text-muted fw-bold small mb-3 letter-spacing-1">Items Requested</h6>
+                                                        <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+                                                            <table class="table table-sm mb-0">
+                                                                <thead class="bg-light">
+                                                                    <tr>
+                                                                        <th class="ps-3 py-2 text-muted small">Item Name</th>
+                                                                        <th class="py-2 text-muted small">Price</th>
+                                                                        <th class="text-center py-2 text-muted small">Qty</th>
+                                                                        <th class="text-end pe-3 py-2 text-muted small">Subtotal</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {% for item in order.items.all %}
+                                                                    <tr>
+                                                                        <td class="ps-3 py-2">{{ item.product.name }}</td>
+                                                                        <td class="py-2">₱{{ item.price }}</td>
+                                                                        <td class="text-center py-2">{{ item.quantity }}</td>
+                                                                        <td class="text-end pe-3 py-2 fw-bold">₱{% widthratio item.price 1 item.quantity %}</td>
+                                                                    </tr>
+                                                                    {% endfor %}
+                                                                </tbody>
+                                                                <tfoot class="border-top bg-light">
+                                                                    <tr>
+                                                                        <td colspan="3" class="text-end fw-bold py-2 text-uppercase small text-muted">Total:</td>
+                                                                        <td class="text-end fw-bold text-primary py-2 pe-3">₱{{ order.total_amount|floatformat:2 }}</td>
+                                                                    </tr>
+                                                                </tfoot>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-lg-4">
+                                                        <h6 class="text-uppercase text-muted fw-bold small mb-3 letter-spacing-1">Your Documents</h6>
+                                                        {% if order.document1 or order.document2 or order.document3 %}
+                                                            <div class="d-flex flex-column gap-2">
+                                                                {% if order.document1 %}
+                                                                    <a href="{{ order.document1.url }}" target="_blank" class="btn btn-sm btn-white border shadow-sm text-start">
+                                                                        <i class="bi bi-file-earmark-pdf text-danger me-2"></i> Requisition Slip
+                                                                    </a>
+                                                                {% endif %}
+                                                                {% if order.document2 %}
+                                                                    <a href="{{ order.document2.url }}" target="_blank" class="btn btn-sm btn-white border shadow-sm text-start">
+                                                                        <i class="bi bi-file-earmark-text text-primary me-2"></i> Disbursement Voucher
+                                                                    </a>
+                                                                {% endif %}
+                                                                {% if order.document3 %}
+                                                                    <a href="{{ order.document3.url }}" target="_blank" class="btn btn-sm btn-white border shadow-sm text-start">
+                                                                        <i class="bi bi-paperclip text-secondary me-2"></i> Other Documents
+                                                                    </a>
+                                                                {% endif %}
+                                                            </div>
+                                                        {% else %}
+                                                            <div class="p-3 border border-dashed rounded-3 text-center text-muted small bg-white">
+                                                                No documents uploaded.
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-5 bg-light rounded-4">
+                    <i class="bi bi-inbox text-muted display-4 mb-3 d-block"></i>
+                    <h6 class="text-muted">No transaction history yet.</h6>
+                    <a href="{% url 'home' %}" class="btn btn-primary btn-sm mt-2 rounded-pill px-4">Start Shopping</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
